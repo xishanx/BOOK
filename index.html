@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>6 Pages Flipbook</title>
+    <style>
+        body {
+            background: #e0c097;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: start;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        h2 {
+            margin: 20px;
+        }
+
+        .book-container {
+            width: 600px;
+            height: 400px;
+            perspective: 1500px;
+            margin-top: 20px;
+        }
+
+        .scene {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .page {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: #fff;
+            border: 2px solid #555;
+            border-radius: 8px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            backface-visibility: hidden;
+            transition: transform 1s;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+        }
+
+            .page img {
+                max-width: 200px;
+                height: auto;
+                border-radius: 8px;
+                margin-bottom: 20px;
+            }
+
+        .message {
+            text-align: center;
+            width: 100%;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+
+        .page-number {
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .flip-next {
+            transform: rotateY(-180deg);
+        }
+
+        .flip-prev {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body>
+
+    <h2>6 Pages Flipbook</h2>
+    <div class="book-container">
+        <div class="scene" id="scene">
+            <!-- Pages will be generated here -->
+        </div>
+    </div>
+
+    <script>
+        const totalPages = 6;
+
+        // Apni local images ka relative path
+        const backgroundImagePage1 = 'images/page1-bg.jpg'; // Page 1 ka background
+        const pageImages = [
+            '', // Page 1 ke liye img tag nahi hai, wo background se hoga
+            'images/page2.jpg',
+            'images/page3.jpg',
+            'images/page4.jpg',
+            'images/page5.jpg',
+            'images/page6.jpg'
+        ];
+
+        const messages = [
+            'Memory of Ayushi & Ishan',
+            'In Aakhon Ki Innocence Pe To Ham Fida Hai Teri aankhon mein khuda ki likhi koi baat hai,Bina saje sawre bhi kitni khubsurat raat hai.Koi kajal, koi shringar zaroori hi nahi lagta,Bas teri aankhon se hi toh dil mera lagta. Teri seedhi saaf aankhon mein sachchai ka noor hai, Jab tu dekhti hai mujhe, har gham door hai. Kaash in aankhon mein main hamesha basa rahoon, Tere sapnon ka pehredaar ban har raat raha karoon ',
+            'Yeh hai apni 1st Unofficially Official Pic lekin Cute aai hai (actually mai khud ki mirror selfie lene ka try kr raha thaa)',
+            'Yeh hai 16th Feb ki Yaadein jo din apan dono k leeye bohto special thaa, jissey jab bhi yaad karo, lagta hai maano kal ki he baat thi (THIS IS HOW TIME FLIES)',
+            'Yeh hai 19th April ki kuch khubsurat Yaadein',
+            'Ye hai apni most iconic picture jissey apan future me frame karwayege (Actually waqt kam hai isly itna he rakh raha hu but yaad rakhna ye sirf ek trailer hai) '
+        ];
+
+        const scene = document.getElementById('scene');
+        const pages = [];
+
+        for (let i = 0; i < totalPages; i++) {
+            const page = document.createElement('div');
+            page.className = 'page';
+
+            if (i === 0) {
+                // Page 1 ka background image
+                page.style.backgroundImage = `url('${backgroundImagePage1}')`;
+            }
+
+            if (i >= 1 && i <= 5) {
+                const img = document.createElement('img');
+                img.src = pageImages[i];
+                page.appendChild(img);
+            }
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message';
+            msgDiv.innerText = messages[i];
+
+            const pageNumDiv = document.createElement('div');
+            pageNumDiv.className = 'page-number';
+            pageNumDiv.innerText = `Page ${i + 1} of ${totalPages}`;
+
+            page.appendChild(msgDiv);
+            page.appendChild(pageNumDiv);
+
+            if (i !== 0) {
+                page.style.display = 'none';
+            }
+
+            page.addEventListener('click', () => {
+                flipToNext(i);
+            });
+
+            scene.appendChild(page);
+            pages.push(page);
+        }
+
+        function showPage(index) {
+            pages.forEach((p, i) => {
+                p.style.display = (i === index) ? 'flex' : 'none';
+                p.classList.remove('flip-next', 'flip-prev');
+            });
+        }
+
+        function flipToNext(fromIndex) {
+            if (fromIndex >= totalPages - 1) return;
+            const toIndex = fromIndex + 1;
+            flipPage(fromIndex, toIndex, 'next');
+        }
+
+        function flipPage(fromIndex, toIndex, direction) {
+            const fromPage = pages[fromIndex];
+            const toPage = pages[toIndex];
+
+            toPage.style.display = 'flex';
+
+            if (direction === 'next') {
+                fromPage.classList.add('flip-next');
+            } else {
+                fromPage.classList.add('flip-prev');
+            }
+
+            setTimeout(() => {
+                fromPage.classList.remove('flip-next', 'flip-prev');
+                showPage(toIndex);
+            }, 1000);
+        }
+
+        pages[totalPages - 1].addEventListener('click', () => {
+            showPage(0);
+        });
+    </script>
+
+</body>
+</html>
